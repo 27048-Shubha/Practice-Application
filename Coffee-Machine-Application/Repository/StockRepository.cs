@@ -1,0 +1,69 @@
+﻿using Coffee_Machine_Application.Enums;
+using Coffee_Machine_Application.Model;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Coffee_Machine_Application.Repository
+{
+    internal class StockRepository
+    {
+        private object _stockLock = new ();
+        private static IngredientQuantity StockQuantity = new IngredientQuantity();
+
+        public void UseIngredients(IngredientQuantity quantity)
+        {
+            lock (_stockLock)
+            {
+                StockQuantity.CoffeeBean = quantity.CoffeeBean;
+                StockQuantity.Milk = quantity.Milk;
+                StockQuantity.Sugar = quantity.Sugar;
+                StockQuantity.Water = quantity.Water;
+            }
+        }
+
+        public IngredientQuantity GetCurrentStockQuantity()
+        {
+            lock (_stockLock)
+            {
+                return new IngredientQuantity(StockQuantity);
+            }
+        }
+
+        public int Refill(IngredientType ingredientType)
+        {
+            lock (_stockLock)
+            {
+                int refilledQuantity = 0;
+                switch (ingredientType)
+                {
+                    case IngredientType.CoffeeBean:
+                        refilledQuantity = (int)(IngredientRange.Max) - (int)StockQuantity.CoffeeBean;
+                        StockQuantity.CoffeeBean = (int) IngredientRange.Max;
+                        break;
+
+                    case IngredientType.Milk:
+                        refilledQuantity = (int) IngredientRange.Max - (int) StockQuantity.Milk;
+                        StockQuantity.CoffeeBean = (int)IngredientRange.Max;
+                        break;
+
+                    case IngredientType.Water:
+                        refilledQuantity = (int)IngredientRange.Max - (int)StockQuantity.Water;
+                        StockQuantity.CoffeeBean = (int)IngredientRange.Max;
+                        break;
+
+                    case IngredientType.Sugar:
+                        refilledQuantity = (int)IngredientRange.Max - (int)StockQuantity.Sugar;
+                        StockQuantity.CoffeeBean = (int)IngredientRange.Max;
+                        break;
+                }
+
+                return refilledQuantity;
+
+            }
+            
+        }
+    }
+}

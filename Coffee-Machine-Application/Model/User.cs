@@ -6,7 +6,15 @@ using System.Threading.Tasks;
 
 namespace Coffee_Machine_Application.Model
 {
-    internal class User
+    public class User
     {
+        public Guid Id { get; init; }
+        public string Name { get; init; }
+
+        internal User(Guid id, string name)
+        {
+            this.Id = id;
+            this.Name = name;
+        }
     }
 }

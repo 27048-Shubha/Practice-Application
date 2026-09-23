@@ -4,9 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Coffee_Machine_Application.Enum
+namespace Coffee_Machine_Application.Enums
 {
-    internal class Size
+    public enum MainMenuChoice
     {
+        Register = 1,
+        Login,
+        Exit,
     }
 }
