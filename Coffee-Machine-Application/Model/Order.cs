@@ -11,10 +11,10 @@ namespace Coffee_Machine_Application.Model
     {
         public Order()
         {
-            this.OnStatusChanged += Program.PrintStatus;
+            this.OnStatusChanged += Program.PrintOrderStatus;
         }
 
-        public delegate void StatusChanged(OrderStatus status);
+        public delegate void StatusChanged(Order order);
         public event StatusChanged OnStatusChanged;
 
         private OrderStatus _status;
@@ -32,7 +32,7 @@ namespace Coffee_Machine_Application.Model
             set
             {
                 _status = value;
-                OnStatusChanged.Invoke(_status);
+                OnStatusChanged?.Invoke(this);
             }
         }
 
@@ -41,6 +41,6 @@ namespace Coffee_Machine_Application.Model
         public DateTime ProcessingEndTime { get; set; }
         public DateTime DeliveredTime { get; set; }
 
-        public Guid VendingMachineId { get; set; }
+        public int VendingMachineId { get; set; }
     }
 }

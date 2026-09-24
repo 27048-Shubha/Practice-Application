@@ -8,32 +8,57 @@ namespace Coffee_Machine_Application.Service
     {
         private readonly OrderRepository _orderRepository;
         private readonly StockService _stockService;
-        private OrderStatus orderStatus;
 
-        internal OrderService(OrderRepository orderRepository, StockService stockService)
+        private object queueLock = new();
+        private Queue<Order> OrderQueue = new ();
+        internal OrderService(OrderRepository orderRepository,  StockService stockService)
         {
             this._orderRepository = orderRepository;
             this._stockService = stockService;
-            this.orderStatus = OrderStatus.Received;
         }
 
-        public async Task AddOrder(OrderDTO order)
+        public void EnqueueOrder(OrderDTO order)
         {
-            Order orderDetails =
+            lock (queueLock)
+            {
+                Order orderDetails =
                 new()
                 {
                     OrderId = order.OrderId,
                     Customer = SessionHandler.CurrentUser,
+                    Status = OrderStatus.Received,
                     CoffeeType = order.Type,
                     Quantity = order.Quantity,
-                    Status = this.orderStatus,
                     ReceivedTime = order.ReceivedTime,
-                    VendingMachineId = order.VendingMachineId,
                 };
-            orderDetails.SourcingEndTime = await this.SourceIngredients(orderDetails);
-            orderDetails.ProcessingEndTime = await this.PrepareOrder(orderDetails);
-            orderDetails.DeliveredTime = this.GetDeliveryTime(orderDetails);
-            this._orderRepository.Add(orderDetails);
+                OrderQueue.Enqueue(orderDetails);
+            }
+        }
+
+        public async Task ProcessOrder(CoffeeMachine machine)
+        {
+            while (true)
+            {
+                Order? currentOrder = null;
+                lock (queueLock)
+                {
+                    if (OrderQueue.Count != 0)
+                    {
+                        currentOrder = OrderQueue.Dequeue();
+                    }
+                }
+
+                if (currentOrder != null)
+                {
+                    machine.CurrentOrderId = currentOrder.OrderId; 
+                    machine.Status = MachineStatus.NotAvailable;
+                    currentOrder.VendingMachineId = machine.Id;
+                    currentOrder.SourcingEndTime = await this.SourceIngredients(currentOrder);
+                    currentOrder.ProcessingEndTime = await this.PrepareOrder(currentOrder);
+                    currentOrder.DeliveredTime = this.GetDeliveryTime(currentOrder, machine);
+                    this._orderRepository.Add(currentOrder);
+                }
+            }
         }
 
         public async Task<DateTime> SourceIngredients(Order order)
@@ -43,7 +68,7 @@ namespace Coffee_Machine_Application.Service
 
             if (!this._stockService.IsAllIngredientsAvailable(order.CoffeeType, order.Quantity))
             {
-                order.Status = OrderStatus.WaitingForIngredients; //TODO:EVENTS
+                order.Status = OrderStatus.WaitingForIngredients;
                 value = this._stockService.RefillIngredients();
             }
 
@@ -58,8 +83,9 @@ namespace Coffee_Machine_Application.Service
             return DateTime.Now;
         }
 
-        public DateTime GetDeliveryTime(Order order)
+        public DateTime GetDeliveryTime(Order order, CoffeeMachine machine)
         {
+            machine.Status = MachineStatus.NotAvailable;
             order.Status = OrderStatus.Delivered;
             return DateTime.Now;
         }

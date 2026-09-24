@@ -18,7 +18,7 @@
             this._stockService = stockService;
         }
 
-        public async Task RunOrderMenu()
+        public void RunOrderMenu()
         {
             while (true)
             {
@@ -29,7 +29,7 @@
                     switch (choice)
                     {
                         case OrderMenu.PlaceOrder:
-                            await this.PlaceOrder();
+                            this.PlaceOrder();
                             break;
 
                         case OrderMenu.CheckStock:
@@ -47,13 +47,19 @@
             }
         }
 
-        public async Task PlaceOrder()
+        public async Task StartMachine(CoffeeMachine machine)
+        {
+            machine.Status = MachineStatus.Available;
+            await this._orderService.ProcessOrder(machine);
+        }
+
+        public void PlaceOrder()
         {
             CoffeeType type = this._console.GetCoffeeChoice();
             QuantityRange quantity = this._console.GetOrderQuantity();
 
             OrderDTO order = new OrderDTO(Guid.NewGuid(), type, quantity, DateTime.Now, Guid.NewGuid());
-            await this._orderService.AddOrder(order);
+            this._orderService.EnqueueOrder(order);
         }
 
         public void CheckStockQuantity()

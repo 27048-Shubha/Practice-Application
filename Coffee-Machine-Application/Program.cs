@@ -25,38 +25,53 @@
 
             MainController mainController = new MainController(console, orderController, authService);
 
-            await mainController.Run();
+            mainController.Run();
         }
 
-        public static void PrintStatus(OrderStatus status)
+        public static void PrintMachineStatus(CoffeeMachine machine, Guid orderId)
         {
-            ConsoleView console = new ();
-            switch (status)
+            ConsoleView console = new();
+            switch (machine.Status)
             {
-                case OrderStatus.Failed:
-                    console.DisplayOrderStatus("[Order status] Order failed!");
-                    break;
-                case OrderStatus.WaitingForIngredients:
-                    console.DisplayOrderStatus("[Order status] Waiting for ingredients...");
-                    break;
-                case OrderStatus.WaitingForVendingMachine:
-                    console.DisplayOrderStatus("[Order status] Waiting for vending machine...");
-                    break;
-                case OrderStatus.Sourcing:
-                    console.DisplayOrderStatus("[Order status] Sourcing ingredients...");
-                    break;
-                case OrderStatus.Preparing:
-                    console.DisplayOrderStatus("[Order status] Preparing order...");
-                    break;
-                case OrderStatus.Delivered:
-                    console.DisplayOrderStatus("[Order status] Order delivered!");
-                    break;
-                case OrderStatus.Cancelled:
-                    console.DisplayOrderStatus("[Order status] Order cancelled!");
+                case MachineStatus.NotAvailable:
+                    console.DisplayOrderStatus($"[Machine {machine.Id}] Processing Order:{orderId}");
                     break;
 
                 default:
-                    console.DisplayOrderStatus("[Order status] Order received!");
+                    console.DisplayOrderStatus($"[Machine {machine.Id}] Waiting for orders");
+                    break;
+            }
+        }
+
+        public static void PrintOrderStatus(Order order)
+        {
+            ConsoleView console = new ();
+            switch (order.Status)
+            {
+                case OrderStatus.Failed:
+                    console.DisplayOrderStatus($"[Order {order.OrderId}] Order failed!");
+                    break;
+                case OrderStatus.WaitingForIngredients:
+                    console.DisplayOrderStatus($"[Order {order.OrderId}] Waiting for ingredients...");
+                    break;
+                case OrderStatus.WaitingForVendingMachine:
+                    console.DisplayOrderStatus($"[Order {order.OrderId}] Waiting for vending machine...");
+                    break;
+                case OrderStatus.Sourcing:
+                    console.DisplayOrderStatus($"[Order {order.OrderId}] Sourcing ingredients...");
+                    break;
+                case OrderStatus.Preparing:
+                    console.DisplayOrderStatus($"[Order {order.OrderId}] Preparing order...");
+                    break;
+                case OrderStatus.Delivered:
+                    console.DisplayOrderStatus($"[Order {order.OrderId}] Order delivered!");
+                    break;
+                case OrderStatus.Cancelled:
+                    console.DisplayOrderStatus($"[Order {order.OrderId}] Order cancelled!");
+                    break;
+
+                default:
+                    console.DisplayOrderStatus($"[Order {order.OrderId}] Order received!");
                     break;
                     
             }

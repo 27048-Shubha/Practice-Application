@@ -1,4 +1,5 @@
 ﻿using Coffee_Machine_Application.Enums;
+using Coffee_Machine_Application.Model;
 using Coffee_Machine_Application.Service;
 using Coffee_Machine_Application.View;
 using System;
@@ -21,9 +22,13 @@ namespace Coffee_Machine_Application.Controller
             this._authService = authService;
         }
 
-        public async Task Run()
+        public void Run()
         {
             this.InitializeStock();
+
+            Task.Run(() => this._orderController.StartMachine(new CoffeeMachine(1)));
+            Task.Run(() => this._orderController.StartMachine(new CoffeeMachine(2)));
+            Task.Run(() => this._orderController.StartMachine(new CoffeeMachine(3)));
 
             while (true)
             {
@@ -37,7 +42,7 @@ namespace Coffee_Machine_Application.Controller
                             break;
 
                         case MainMenuChoice.Login:
-                            await this.Login();
+                            this.Login();
                             break;
 
                         case MainMenuChoice.Exit:
@@ -72,7 +77,7 @@ namespace Coffee_Machine_Application.Controller
             this._console.DisplayRegistrationStatus(true);
         }
 
-        public async Task Login()
+        public void Login()
         {
             string userName = this._console.GetUserName();
 
@@ -83,7 +88,7 @@ namespace Coffee_Machine_Application.Controller
             }
 
             this._console.DisplayLoginStatus(true);
-            await this._orderController.RunOrderMenu();
+            this._orderController.RunOrderMenu();
         }
     }
 }
