@@ -1,6 +1,7 @@
 ﻿namespace Coffee_Machine_Application
 {
     using Coffee_Machine_Application.Controller;
+    using Coffee_Machine_Application.Model;
     using Coffee_Machine_Application.Repository;
     using Coffee_Machine_Application.Service;
     using Coffee_Machine_Application.View;
@@ -21,7 +22,13 @@
             OrderController orderController = new(console, orderService, stockService);
 
             MainController mainController = new MainController(console, orderController, authService);
+
             await mainController.Run();
+        }
+
+        public static void PrintStatus()
+        {
+
         }
     }
 }

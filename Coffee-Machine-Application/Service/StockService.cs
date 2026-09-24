@@ -48,10 +48,15 @@ namespace Coffee_Machine_Application.Service
             return this._stockRepository.Refill(ingredient);
         }
 
-        public bool IsAllIngredientsAvailable(CoffeeType type)
+        public bool IsAllIngredientsAvailable(CoffeeType type, QuantityRange range)
         {
             IngredientQuantity currentQuantity = this.FetchCurrentQuantity();
             IngredientQuantity requiredQuantity = this.FetchDefaultQuantity(type);
+
+            requiredQuantity.CoffeeBean *= (int)range;
+            requiredQuantity.Milk *= (int)range;
+            requiredQuantity.Water *= (int)range;
+            requiredQuantity.Sugar *= (int)range;
 
             this.isCoffeeBeenAvailable = currentQuantity.CoffeeBean >= requiredQuantity.CoffeeBean;
             this.isWaterAvailable = currentQuantity.Water >= requiredQuantity.Water;
@@ -61,11 +66,11 @@ namespace Coffee_Machine_Application.Service
             return (isCoffeeBeenAvailable && isWaterAvailable) && (isMilkAvailable && isSugarAvailable);
         }
 
-        public int ConsumeIngredients(CoffeeType type)
+        public int ConsumeIngredients(CoffeeType type, QuantityRange range)
         {
-            IngredientQuantity quantity = this.FetchDefaultQuantity(type);
-            this._stockRepository.UseIngredients(quantity);
-            int value = ((int)quantity.CoffeeBean + (int)quantity.Milk + (int)quantity.Water + (int)quantity.Sugar);
+            IngredientQuantity defaultQuantity = this.FetchDefaultQuantity(type);
+            this._stockRepository.UseIngredients(defaultQuantity, range);
+            int value = ((int)defaultQuantity.CoffeeBean + (int)defaultQuantity.Milk + (int)defaultQuantity.Water + (int)defaultQuantity.Sugar) * (int)range;
             return value;
         }
 

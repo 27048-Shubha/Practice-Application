@@ -2,7 +2,7 @@
 {
     public enum CoffeeType
     {
-        Americano,
+        Americano = 1,
         Cappucino,
         Espresso,
         Latte,

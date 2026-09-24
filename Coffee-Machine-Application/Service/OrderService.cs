@@ -28,18 +28,20 @@ namespace Coffee_Machine_Application.Service
                     Quantity = order.Quantity,
                     Status = this.orderStatus,
                     ReceivedTime = order.ReceivedTime,
-                    SourcingEndTime = await this.SourceIngredients(order.Type),
-                    ProcessingEndTime = await this.PrepareOrder(order.Type),
+                    SourcingEndTime = await this.SourceIngredients(order.Type, order.Quantity),
+                    ProcessingEndTime = await this.PrepareOrder(order.Type, order.Quantity),
                     DeliveredTime = this.GetDeliveryTime(),
                     VendingMachineId = order.VendingMachineId,
                 };
             this._orderRepository.Add(orderDetails);
         }
 
-        public async Task<DateTime> SourceIngredients(CoffeeType type)
+        public async Task<DateTime> SourceIngredients(CoffeeType type, QuantityRange range)
         {
             int value = 0;
-            if (!this._stockService.IsAllIngredientsAvailable(type))
+            orderStatus = OrderStatus.Sourcing;
+
+            if (!this._stockService.IsAllIngredientsAvailable(type, range))
             {
                 orderStatus = OrderStatus.WaitingForIngredients; //TODO:EVENTS
                 value = this._stockService.RefillIngredients();
@@ -48,15 +50,17 @@ namespace Coffee_Machine_Application.Service
             await Task.Delay(value);
             return DateTime.Now;
         }
-        public async Task<DateTime> PrepareOrder(CoffeeType type)
+        public async Task<DateTime> PrepareOrder(CoffeeType type, QuantityRange range)
         {
-            int value = this._stockService.ConsumeIngredients(type);
+            orderStatus = OrderStatus.Preparing;
+            int value = this._stockService.ConsumeIngredients(type, range);
             await Task.Delay(value);
             return DateTime.Now;
         }
 
         public DateTime GetDeliveryTime()
         {
+            orderStatus = OrderStatus.Delivered;
             return DateTime.Now;
         }
     }

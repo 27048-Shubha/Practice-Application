@@ -13,14 +13,14 @@ namespace Coffee_Machine_Application.Repository
         private object _stockLock = new ();
         private static IngredientQuantity StockQuantity = new IngredientQuantity();
 
-        public void UseIngredients(IngredientQuantity quantity)
+        public void UseIngredients(IngredientQuantity quantity, QuantityRange range)
         {
             lock (_stockLock)
             {
-                StockQuantity.CoffeeBean = quantity.CoffeeBean;
-                StockQuantity.Milk = quantity.Milk;
-                StockQuantity.Sugar = quantity.Sugar;
-                StockQuantity.Water = quantity.Water;
+                StockQuantity.CoffeeBean -= ((int)quantity.CoffeeBean * (int)range);
+                StockQuantity.Milk -= ((int)quantity.Milk * (int)range);
+                StockQuantity.Sugar -= ((int)quantity.Sugar * (int)range);
+                StockQuantity.Water -= ((int)quantity.Water * (int)range);
             }
         }
 

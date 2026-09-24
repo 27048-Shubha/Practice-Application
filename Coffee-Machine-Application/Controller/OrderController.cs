@@ -24,6 +24,7 @@
             {
                 try
                 {
+                    this.CheckStockQuantity();
                     OrderMenu choice = this._console.GetOrderChoice();
                     switch (choice)
                     {

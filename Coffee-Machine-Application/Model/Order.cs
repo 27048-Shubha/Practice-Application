@@ -14,6 +14,7 @@ namespace Coffee_Machine_Application.Model
         public CoffeeType CoffeeType { get; set; }
         public QuantityRange Quantity { get; set; }
         public OrderStatus Status { get; set; }
+
         public DateTime ReceivedTime { get; set; }
         public DateTime SourcingEndTime { get; set; }
         public DateTime ProcessingEndTime { get; set; }
