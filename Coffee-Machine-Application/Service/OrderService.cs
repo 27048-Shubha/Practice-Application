@@ -28,39 +28,39 @@ namespace Coffee_Machine_Application.Service
                     Quantity = order.Quantity,
                     Status = this.orderStatus,
                     ReceivedTime = order.ReceivedTime,
-                    SourcingEndTime = await this.SourceIngredients(order.Type, order.Quantity),
-                    ProcessingEndTime = await this.PrepareOrder(order.Type, order.Quantity),
-                    DeliveredTime = this.GetDeliveryTime(),
                     VendingMachineId = order.VendingMachineId,
                 };
+            orderDetails.SourcingEndTime = await this.SourceIngredients(orderDetails);
+            orderDetails.ProcessingEndTime = await this.PrepareOrder(orderDetails);
+            orderDetails.DeliveredTime = this.GetDeliveryTime(orderDetails);
             this._orderRepository.Add(orderDetails);
         }
 
-        public async Task<DateTime> SourceIngredients(CoffeeType type, QuantityRange range)
+        public async Task<DateTime> SourceIngredients(Order order)
         {
             int value = 0;
-            orderStatus = OrderStatus.Sourcing;
+            order.Status = OrderStatus.Sourcing;
 
-            if (!this._stockService.IsAllIngredientsAvailable(type, range))
+            if (!this._stockService.IsAllIngredientsAvailable(order.CoffeeType, order.Quantity))
             {
-                orderStatus = OrderStatus.WaitingForIngredients; //TODO:EVENTS
+                order.Status = OrderStatus.WaitingForIngredients; //TODO:EVENTS
                 value = this._stockService.RefillIngredients();
             }
 
             await Task.Delay(value);
             return DateTime.Now;
         }
-        public async Task<DateTime> PrepareOrder(CoffeeType type, QuantityRange range)
+        public async Task<DateTime> PrepareOrder(Order order)
         {
-            orderStatus = OrderStatus.Preparing;
-            int value = this._stockService.ConsumeIngredients(type, range);
+            order.Status = OrderStatus.Preparing;
+            int value = this._stockService.ConsumeIngredients(order.CoffeeType, order.Quantity);
             await Task.Delay(value);
             return DateTime.Now;
         }
 
-        public DateTime GetDeliveryTime()
+        public DateTime GetDeliveryTime(Order order)
         {
-            orderStatus = OrderStatus.Delivered;
+            order.Status = OrderStatus.Delivered;
             return DateTime.Now;
         }
     }

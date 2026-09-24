@@ -154,7 +154,11 @@ namespace Coffee_Machine_Application.View
                 Console.WriteLine("Failed to login. Try again.");
             }
         }
-
+        public void DisplayOrderStatus(string message)
+        {
+            Console.WriteLine(message);
+            Thread.Sleep(1000);
+        }
         public void DisplayExitMessage()
         {
             Console.WriteLine(MajorLineBreaker);

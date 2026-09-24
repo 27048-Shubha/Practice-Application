@@ -46,17 +46,17 @@ namespace Coffee_Machine_Application.Repository
 
                     case IngredientType.Milk:
                         refilledQuantity = (int) IngredientRange.Max - (int) StockQuantity.Milk;
-                        StockQuantity.CoffeeBean = (int)IngredientRange.Max;
+                        StockQuantity.Milk = (int)IngredientRange.Max;
                         break;
 
                     case IngredientType.Water:
                         refilledQuantity = (int)IngredientRange.Max - (int)StockQuantity.Water;
-                        StockQuantity.CoffeeBean = (int)IngredientRange.Max;
+                        StockQuantity.Water = (int)IngredientRange.Max;
                         break;
 
                     case IngredientType.Sugar:
                         refilledQuantity = (int)IngredientRange.Max - (int)StockQuantity.Sugar;
-                        StockQuantity.CoffeeBean = (int)IngredientRange.Max;
+                        StockQuantity.Sugar = (int)IngredientRange.Max;
                         break;
                 }
 
