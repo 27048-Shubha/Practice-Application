@@ -16,10 +16,15 @@ namespace Coffee_Machine_Application.Service
             return this._userRepository.IsUserExists(userName);
         }
 
+        public async Task Register(string userName)
+        {
+            await this._userRepository.Add(new User(Guid.NewGuid(), userName));
+        }
+
         public bool Login(string userName)
         {
             // Registration, Login
-            if (this.IsUserExists(userName))
+            if (!this.IsUserExists(userName))
             {
                 return false;
             }

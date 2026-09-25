@@ -25,7 +25,7 @@
 
             MainController mainController = new MainController(console, orderController, authService);
 
-            mainController.Run();
+            await mainController.Run();
         }
 
         public static void PrintMachineStatus(CoffeeMachine machine, Guid orderId)

@@ -22,13 +22,13 @@ namespace Coffee_Machine_Application.Controller
             this._authService = authService;
         }
 
-        public void Run()
+        public async Task Run()
         {
             this.InitializeStock();
 
-            Task.Run(() => this._orderController.StartMachine(new CoffeeMachine(1)));
-            Task.Run(() => this._orderController.StartMachine(new CoffeeMachine(2)));
-            Task.Run(() => this._orderController.StartMachine(new CoffeeMachine(3)));
+            _ = Task.Run(() => this._orderController.StartMachine(new CoffeeMachine(1)));
+            _ = Task.Run(() => this._orderController.StartMachine(new CoffeeMachine(2)));
+            _ = Task.Run(() => this._orderController.StartMachine(new CoffeeMachine(3)));
 
             while (true)
             {
@@ -38,7 +38,7 @@ namespace Coffee_Machine_Application.Controller
                     switch (choice)
                     {
                         case MainMenuChoice.Register:
-                            this.Register();
+                            await this.Register();
                             break;
 
                         case MainMenuChoice.Login:
@@ -65,7 +65,7 @@ namespace Coffee_Machine_Application.Controller
             this._orderController.RefillStock(IngredientType.Sugar);
         }
 
-        public void Register()
+        public async Task Register()
         {
             string userName = this._console.GetUserName();
             if (this._authService.IsUserExists(userName))
@@ -74,6 +74,7 @@ namespace Coffee_Machine_Application.Controller
                 return;
             }
 
+            await this._authService.Register(userName);
             this._console.DisplayRegistrationStatus(true);
         }
 

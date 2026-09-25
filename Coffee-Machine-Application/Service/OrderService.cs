@@ -56,7 +56,7 @@ namespace Coffee_Machine_Application.Service
                     currentOrder.SourcingEndTime = await this.SourceIngredients(currentOrder);
                     currentOrder.ProcessingEndTime = await this.PrepareOrder(currentOrder);
                     currentOrder.DeliveredTime = this.GetDeliveryTime(currentOrder, machine);
-                    this._orderRepository.Add(currentOrder);
+                    await this._orderRepository.Add(currentOrder);
                 }
             }
         }
