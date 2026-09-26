@@ -37,7 +37,7 @@ namespace Coffee_Machine_Application.Service
 
         public async Task ProcessOrder(CoffeeMachine machine, CancellationToken cancellationToken)
         {
-            while (true)
+            while (!cancellationToken.IsCancellationRequested)
             {
                 
                 Order? currentOrder = null;
@@ -56,21 +56,22 @@ namespace Coffee_Machine_Application.Service
                         machine.CurrentOrderId = currentOrder.OrderId;
                         machine.Status = MachineStatus.NotAvailable;
                         currentOrder.VendingMachineId = machine.Id;
-                        currentOrder.SourcingEndTime = await this.SourceIngredients(currentOrder);
-                        currentOrder.ProcessingEndTime = await this.PrepareOrder(currentOrder);
+                        currentOrder.SourcingEndTime = await this.SourceIngredients(currentOrder, cancellationToken);
+                        currentOrder.ProcessingEndTime = await this.PrepareOrder(currentOrder, cancellationToken);
                         currentOrder.DeliveredTime = this.GetDeliveryTime(currentOrder, machine);
                         await this._orderRepository.Add(currentOrder);
                     }
                     catch(OperationCanceledException)
                     {
                         currentOrder.Status = OrderStatus.Cancelled;
+                        machine.Status = MachineStatus.NotAvailable;
                         await this._orderRepository.Add(currentOrder);
                     }
                 }
             }
         }
 
-        public async Task<DateTime> SourceIngredients(Order order)
+        public async Task<DateTime> SourceIngredients(Order order, CancellationToken cancellationToken)
         {
             int value = 0;
             order.Status = OrderStatus.Sourcing;
@@ -81,14 +82,14 @@ namespace Coffee_Machine_Application.Service
                 value = this._stockService.RefillIngredients();
             }
 
-            await Task.Delay(value);
+            await Task.Delay(value, cancellationToken);
             return DateTime.Now;
         }
-        public async Task<DateTime> PrepareOrder(Order order)
+        public async Task<DateTime> PrepareOrder(Order order, CancellationToken cancellationToken)
         {
             order.Status = OrderStatus.Preparing;
             int value = this._stockService.ConsumeIngredients(order.CoffeeType, order.Quantity);
-            await Task.Delay(value);
+            await Task.Delay(value, cancellationToken);
             return DateTime.Now;
         }
 
