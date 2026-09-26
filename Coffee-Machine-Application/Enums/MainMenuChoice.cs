@@ -10,6 +10,8 @@ namespace Coffee_Machine_Application.Enums
     {
         Register = 1,
         Login,
+        PowerOffMachine1,
+        PowerOnMachine1,
         Exit,
     }
 }

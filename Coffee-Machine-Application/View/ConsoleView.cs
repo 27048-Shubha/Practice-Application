@@ -37,7 +37,9 @@ namespace Coffee_Machine_Application.View
                 this.WriteToConsole("Welcome to the Coffee Shop");
                 this.WriteToConsole("[1] Register");
                 this.WriteToConsole("[2] Login");
-                this.WriteToConsole("[3] Quit");
+                this.WriteToConsole("[3] Power Off Machine 1");
+                this.WriteToConsole("[4] Power On Machine 0");
+                this.WriteToConsole("[5] Quit");
                 this.WriteToConsole(MajorLineBreaker);
 
                 this.WriteToConsole("\nEnter your choice: ");

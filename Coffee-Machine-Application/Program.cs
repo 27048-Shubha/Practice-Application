@@ -21,10 +21,11 @@
             AuthService authService = new (userRepository); 
             StockService stockService = new (stockRepository);
             OrderService orderService = new (orderRepository, stockService);
+            MachineService machineService = new MachineService();
 
             OrderController orderController = new(console, orderService, stockService);
 
-            MainController mainController = new MainController(console, orderController, authService, cancellationTokenSource);
+            MainController mainController = new MainController(console, orderController, authService, cancellationTokenSource, machineService);
 
             await mainController.Run();
         }

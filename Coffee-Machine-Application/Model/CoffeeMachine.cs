@@ -15,9 +15,12 @@ namespace Coffee_Machine_Application.Model
         {
             this.Id = id;
             this.OnMachineStatusChange += Program.PrintMachineStatus;
+            this.IsPowerOff = false;
         }
 
         public int Id { get; set; }
+        
+        public bool IsPowerOff { get; set; }
 
         public Guid CurrentOrderId { get; set; }
 

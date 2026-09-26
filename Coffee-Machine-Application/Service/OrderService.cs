@@ -51,21 +51,29 @@ namespace Coffee_Machine_Application.Service
 
                 if (currentOrder != null)
                 {
-                    try
+                    if(machine.IsPowerOff == false)
                     {
-                        machine.CurrentOrderId = currentOrder.OrderId;
-                        machine.Status = MachineStatus.NotAvailable;
-                        currentOrder.VendingMachineId = machine.Id;
-                        currentOrder.SourcingEndTime = await this.SourceIngredients(currentOrder, cancellationToken);
-                        currentOrder.ProcessingEndTime = await this.PrepareOrder(currentOrder, cancellationToken);
-                        currentOrder.DeliveredTime = this.GetDeliveryTime(currentOrder, machine);
-                        await this._orderRepository.Add(currentOrder);
+                        try
+                        {
+                            machine.CurrentOrderId = currentOrder.OrderId;
+                            machine.Status = MachineStatus.NotAvailable;
+                            currentOrder.VendingMachineId = machine.Id;
+                            currentOrder.SourcingEndTime = await this.SourceIngredients(currentOrder, cancellationToken);
+                            currentOrder.ProcessingEndTime = await this.PrepareOrder(currentOrder, cancellationToken);
+                            currentOrder.DeliveredTime = this.GetDeliveryTime(currentOrder, machine);
+                            await this._orderRepository.Add(currentOrder);
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            currentOrder.Status = OrderStatus.Cancelled;
+                            machine.Status = MachineStatus.NotAvailable;
+                            await this._orderRepository.Add(currentOrder);
+                        }
                     }
-                    catch(OperationCanceledException)
+                    else
                     {
-                        currentOrder.Status = OrderStatus.Cancelled;
-                        machine.Status = MachineStatus.NotAvailable;
-                        await this._orderRepository.Add(currentOrder);
+                        currentOrder.Status = OrderStatus.Paused;
+                        OrderQueue.Enqueue(currentOrder);
                     }
                 }
             }

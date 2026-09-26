@@ -4,6 +4,7 @@
     {
         PlaceOrder = 1,
         CheckStock,
+        PowerOff,
         Back,
     }
 }

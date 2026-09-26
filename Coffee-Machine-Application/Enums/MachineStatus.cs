@@ -10,5 +10,6 @@ namespace Coffee_Machine_Application.Enums
     {
         Available,
         NotAvailable,
+        PoweredOff,
     }
 }

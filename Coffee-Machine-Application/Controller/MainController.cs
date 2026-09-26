@@ -16,21 +16,30 @@ namespace Coffee_Machine_Application.Controller
         private readonly OrderController _orderController;
         private readonly AuthService _authService;
         private readonly CancellationTokenSource _cancellationTokenSource;
-        internal MainController(ConsoleView console, OrderController orderController, AuthService authService, CancellationTokenSource cancellationTokenSource)
+        private readonly MachineService _machineService;
+
+        internal MainController(ConsoleView console, OrderController orderController, AuthService authService, CancellationTokenSource cancellationTokenSource, MachineService machineService)
         {
             this._console = console;
             this._orderController = orderController;
             this._authService = authService;
             this._cancellationTokenSource = cancellationTokenSource;
+            this._machineService = machineService;
+
         }
 
         public async Task Run()
         {
+            List<CoffeeMachine> machineList = new ();
+            machineList.Add(new CoffeeMachine(1));
+            machineList.Add(new CoffeeMachine(2));
+            machineList.Add(new CoffeeMachine(3));
+
             this.InitializeStock();
 
-            _ = Task.Run(() => this._orderController.StartMachine(new CoffeeMachine(1), _cancellationTokenSource.Token));
-            _ = Task.Run(() => this._orderController.StartMachine(new CoffeeMachine(2), _cancellationTokenSource.Token));
-            _ = Task.Run(() => this._orderController.StartMachine(new CoffeeMachine(3), _cancellationTokenSource.Token));
+            _ = Task.Run(() => this._orderController.StartMachine(machineList[0], _cancellationTokenSource.Token));
+            _ = Task.Run(() => this._orderController.StartMachine(machineList[1], _cancellationTokenSource.Token));
+            _ = Task.Run(() => this._orderController.StartMachine(machineList[2], _cancellationTokenSource.Token));
 
             while (true)
             {
@@ -45,6 +54,16 @@ namespace Coffee_Machine_Application.Controller
 
                         case MainMenuChoice.Login:
                             this.Login();
+                            break;
+
+                        case MainMenuChoice.PowerOffMachine1:
+                            this._console.DisplayMessage("Powering off machine 1...");
+                            this._machineService.PowerOff(machineList[0]);
+                            break;
+
+                        case MainMenuChoice.PowerOnMachine1:
+                            this._console.DisplayMessage("Powering on machine 1...");
+                            this._machineService.PowerOn(machineList[0]);
                             break;
 
                         case MainMenuChoice.Exit:

@@ -10,5 +10,6 @@
         Delivered,
         Cancelled,
         Failed,
+        Paused,
     }
 }

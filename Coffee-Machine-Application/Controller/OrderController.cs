@@ -37,6 +37,7 @@
                             break;
 
                         case OrderMenu.Back:
+                            this._console.DisplayMessage("Returning to main menu!");
                             return;
                     }
                 }
@@ -72,5 +73,6 @@
         {
             this._stockService.RefillStock(ingredient); // store refill 
         }
+
     }
 }
