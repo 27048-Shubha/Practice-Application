@@ -15,20 +15,22 @@ namespace Coffee_Machine_Application.Controller
         private readonly ConsoleView _console;
         private readonly OrderController _orderController;
         private readonly AuthService _authService;
-        internal MainController(ConsoleView console, OrderController orderController, AuthService authService)
+        private readonly CancellationTokenSource _cancellationTokenSource;
+        internal MainController(ConsoleView console, OrderController orderController, AuthService authService, CancellationTokenSource cancellationTokenSource)
         {
             this._console = console;
             this._orderController = orderController;
             this._authService = authService;
+            this._cancellationTokenSource = cancellationTokenSource;
         }
 
         public async Task Run()
         {
             this.InitializeStock();
 
-            _ = Task.Run(() => this._orderController.StartMachine(new CoffeeMachine(1)));
-            _ = Task.Run(() => this._orderController.StartMachine(new CoffeeMachine(2)));
-            _ = Task.Run(() => this._orderController.StartMachine(new CoffeeMachine(3)));
+            _ = Task.Run(() => this._orderController.StartMachine(new CoffeeMachine(1), _cancellationTokenSource.Token));
+            _ = Task.Run(() => this._orderController.StartMachine(new CoffeeMachine(2), _cancellationTokenSource.Token));
+            _ = Task.Run(() => this._orderController.StartMachine(new CoffeeMachine(3), _cancellationTokenSource.Token));
 
             while (true)
             {

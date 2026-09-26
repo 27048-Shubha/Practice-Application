@@ -11,6 +11,7 @@
     {
         public static async Task Main(string[] args)
         {
+            CancellationTokenSource cancellationTokenSource = new ();
             ConsoleView console = new();
 
             StockRepository stockRepository = new ();
@@ -23,7 +24,7 @@
 
             OrderController orderController = new(console, orderService, stockService);
 
-            MainController mainController = new MainController(console, orderController, authService);
+            MainController mainController = new MainController(console, orderController, authService, cancellationTokenSource);
 
             await mainController.Run();
         }

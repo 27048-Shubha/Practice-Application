@@ -35,10 +35,11 @@ namespace Coffee_Machine_Application.Service
             }
         }
 
-        public async Task ProcessOrder(CoffeeMachine machine)
+        public async Task ProcessOrder(CoffeeMachine machine, CancellationToken cancellationToken)
         {
             while (true)
             {
+                
                 Order? currentOrder = null;
                 lock (queueLock)
                 {
@@ -50,13 +51,21 @@ namespace Coffee_Machine_Application.Service
 
                 if (currentOrder != null)
                 {
-                    machine.CurrentOrderId = currentOrder.OrderId; 
-                    machine.Status = MachineStatus.NotAvailable;
-                    currentOrder.VendingMachineId = machine.Id;
-                    currentOrder.SourcingEndTime = await this.SourceIngredients(currentOrder);
-                    currentOrder.ProcessingEndTime = await this.PrepareOrder(currentOrder);
-                    currentOrder.DeliveredTime = this.GetDeliveryTime(currentOrder, machine);
-                    await this._orderRepository.Add(currentOrder);
+                    try
+                    {
+                        machine.CurrentOrderId = currentOrder.OrderId;
+                        machine.Status = MachineStatus.NotAvailable;
+                        currentOrder.VendingMachineId = machine.Id;
+                        currentOrder.SourcingEndTime = await this.SourceIngredients(currentOrder);
+                        currentOrder.ProcessingEndTime = await this.PrepareOrder(currentOrder);
+                        currentOrder.DeliveredTime = this.GetDeliveryTime(currentOrder, machine);
+                        await this._orderRepository.Add(currentOrder);
+                    }
+                    catch(OperationCanceledException)
+                    {
+                        currentOrder.Status = OrderStatus.Cancelled;
+                        await this._orderRepository.Add(currentOrder);
+                    }
                 }
             }
         }

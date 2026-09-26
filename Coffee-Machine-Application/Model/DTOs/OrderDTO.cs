@@ -9,9 +9,6 @@
         public QuantityRange Quantity { get; set; }
         public OrderStatus Status { get; set; }
         public DateTime ReceivedTime { get; set; }
-        public DateTime SourcingEndTime { get; set; }
-        public DateTime ProcessingEndTime { get; set; }
-        public DateTime DeliveredTime { get; set; }
         public Guid VendingMachineId { get; set; }
 
         internal OrderDTO(Guid orderId, CoffeeType type, QuantityRange quantity, DateTime receivedTime, Guid vendingmachineId)

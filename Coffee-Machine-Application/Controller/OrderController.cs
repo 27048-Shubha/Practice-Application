@@ -47,10 +47,10 @@
             }
         }
 
-        public async Task StartMachine(CoffeeMachine machine)
+        public async Task StartMachine(CoffeeMachine machine, CancellationToken cancellationToken)
         {
             machine.Status = MachineStatus.Available;
-            await this._orderService.ProcessOrder(machine);
+            await this._orderService.ProcessOrder(machine, cancellationToken);
         }
 
         public void PlaceOrder()
